@@ -19,7 +19,7 @@ def allowed_file(filename):
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return render_template('upload.html')
 
 @app.route('/upload', methods=['POST'])
 def upload_file():
@@ -36,26 +36,38 @@ def upload_file():
         file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
         file.save(file_path)
 
-        # Process the file
+        # Read the CSV file and extract column names
         df = pd.read_csv(file_path)
-        column_name = df.columns[1]
-        duplicates = df[column_name].duplicated(keep=False)
+        column_names = df.columns.tolist()  # Extract column names
 
-        def highlight_duplicates(val, is_duplicate):
-            if is_duplicate:
-                return 'background-color: red'
-            return ''
+        # Pass column names to the template
+        return render_template('process.html', filename=filename, column_names=column_names)
 
-        styled_df = df.style.apply(
-            lambda x: ['background-color: red' if v else '' for v in duplicates],
-            subset=[column_name]
-        )
+@app.route('/process', methods=['POST'])
+def process_file():
+    filename = request.form['filename']
+    selected_column = request.form['select_columns']
+    file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
 
-        output_filename = f"output_{filename.rsplit('.', 1)[0]}.xlsx"
-        output_path = os.path.join(app.config['OUTPUT_FOLDER'], output_filename)
-        styled_df.to_excel(output_path, engine='openpyxl', index=False)
+    # Process the file
+    df = pd.read_csv(file_path)
+    duplicates = df[selected_column].duplicated(keep=False)
 
-        return send_file(output_path, as_attachment=True, download_name=output_filename)
+    def highlight_duplicates(val, is_duplicate):
+        if is_duplicate:
+            return 'background-color: red'
+        return ''
+
+    styled_df = df.style.apply(
+        lambda x: ['background-color: red' if v else '' for v in duplicates],
+        subset=[selected_column]
+    )
+
+    output_filename = f"output_{filename.rsplit('.', 1)[0]}.xlsx"
+    output_path = os.path.join(app.config['OUTPUT_FOLDER'], output_filename)
+    styled_df.to_excel(output_path, engine='openpyxl', index=False)
+
+    return send_file(output_path, as_attachment=True, download_name=output_filename)
 
 if __name__ == '__main__':
     app.run(debug=True)

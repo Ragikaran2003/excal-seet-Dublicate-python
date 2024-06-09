@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload CSV File</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- Custom CSS -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            padding: 20px;
+        }
+        .upload-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+        }
+        .upload-title {
+            text-align: center;
+            color: #007bff;
+            margin-bottom: 30px;
+        }
+        .custom-file-label::after {
+            content: 'Browse';
+        }
+        .upload-btn {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            padding: 10px 20px;
+            transition: background-color 0.3s ease;
+        }
+        .upload-btn:hover {
+            background-color: #0056b3;
+        }
+        .clear-btn {
+            background-color: #dc3545;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            padding: 10px 20px;
+            transition: background-color 0.3s ease;
+            margin-left: 10px;
+        }
+        .clear-btn:hover {
+            background-color: #c82333;
+        }
+    </style>
+</head>
+<body>
+    <div class="upload-container">
+        <h1 class="upload-title">Upload CSV File</h1>
+        <form action="/upload" method="post" enctype="multipart/form-data">
+            <div class="custom-file mb-3">
+                <input type="file" class="custom-file-input" id="customFile" name="file" accept=".csv" onchange="updateLabel(this)" required>
+                <label class="custom-file-label" for="customFile">Choose file</label>
+            </div>
+            <button type="submit" class="upload-btn">Upload</button>
+            <button type="button" class="clear-btn" onclick="clearFile()">Clear</button>
+        </form>
+    </div>
+
+    <!-- JavaScript for Clearing File Input and Updating Label -->
+    <script>
+        function clearFile() {
+            document.getElementById("customFile").value = "";
+            document.querySelector(".custom-file-label").innerHTML = "Choose file";
+        }
+
+        function updateLabel(input) {
+            var filename = input.files[0].name;
+            document.querySelector(".custom-file-label").innerHTML = filename;
+        }
+    </script>
+</body>
+</html>
