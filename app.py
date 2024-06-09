@@ -53,15 +53,10 @@ def process_file():
     df = pd.read_csv(file_path)
     duplicates = df[selected_column].duplicated(keep=False)
 
-    def highlight_duplicates(val, is_duplicate):
-        if is_duplicate:
-            return 'background-color: red'
-        return ''
+    def highlight_duplicates(row):
+        return ['background-color: red'] * len(row) if duplicates.loc[row.name] else [''] * len(row)
 
-    styled_df = df.style.apply(
-        lambda x: ['background-color: red' if v else '' for v in duplicates],
-        subset=[selected_column]
-    )
+    styled_df = df.style.apply(highlight_duplicates, axis=1)
 
     output_filename = f"output_{filename.rsplit('.', 1)[0]}.xlsx"
     output_path = os.path.join(app.config['OUTPUT_FOLDER'], output_filename)
